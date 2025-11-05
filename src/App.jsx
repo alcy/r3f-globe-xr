@@ -3,6 +3,10 @@ import { OrbitControls } from '@react-three/drei'
 import { XR, createXRStore, useXR } from '@react-three/xr'
 import R3fGlobe from 'r3f-globe'
 import { useMemo, useRef, useEffect } from 'react'
+import { patchThreeGlobeForXR } from './utils/patch-three-globe-for-xr'
+
+// Initialize XR patch - this will make frame-ticker replacement available
+const xrPatch = patchThreeGlobeForXR()
 
 const store = createXRStore({
   // foveation: 0 // Optional: can improve quality but reduces performance
@@ -38,20 +42,28 @@ function GlobeViz() {
     color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
   })), [])
 
-  // Manually drive arc animations via useFrame
-  // In desktop: this supplements the automatic RAF ticker (mostly redundant)
-  // In XR: this is the ONLY thing updating (browser RAF doesn't render in XR)
+  // Enable manual mode on mount (for XR compatibility)
+  useEffect(() => {
+    // Enable manual mode for all FrameTicker instances
+    // This stops automatic RAF and lets us drive animations via useFrame
+    xrPatch.enableManualMode()
+    console.log('[XR] Manual animation mode enabled')
+  }, [])
+
+  // Drive BOTH animation systems manually via useFrame
+  // This works in both desktop and XR modes
   useFrame((state, delta) => {
+    const timeDeltaMs = delta * 1000
+
+    // System 1: Layer tickers (arcs, paths, rings, particles)
+    // Handled by our FrameTicker replacement
+    xrPatch.tick(timeDeltaMs)
+
+    // System 2: Globe's tweenGroup (polygon transitions, etc.)
+    // Handled by our new tickManually method in globe-kapsule
     if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
-      const arcsLayer = globe.__kapsuleInstance?._state?.arcsLayer
-
-      if (arcsLayer) {
-        // Manually tick the animation system
-        // delta is in seconds, convert to milliseconds
-        const timeDeltaMs = delta * 1000
-        arcsLayer.tickManually(timeDeltaMs)
-      }
+      globe.__kapsuleInstance?.tickManually(timeDeltaMs)
     }
   })
 

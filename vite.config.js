@@ -9,7 +9,11 @@ export default defineConfig({
   server: {'host': true},
   resolve: {
     alias: {
-      // Use our locally patched three-globe with XR support
+      // Replace frame-ticker with our XR-compatible version
+      // This makes ALL three-globe layers (arcs, paths, rings, particles) work in XR
+      'frame-ticker': path.resolve(__dirname, './src/utils/frame-ticker-xr-replacement.js'),
+
+      // Use our locally patched three-globe with XR support (adds tickManually for tweenGroup)
       'three-globe': path.resolve(__dirname, './three-globe-master/dist/three-globe.mjs')
     }
   }

@@ -3474,6 +3474,23 @@ var Globe = Kapsule({
       state.pausableLayers.forEach(l => l.resumeAnimation?.());
       return this;
     },
+    tickManually: function (state, timeDeltaMs) {
+      // XR-compatible manual animation update
+      // Updates tweenGroup for all transition animations (polygons, etc.)
+
+      // Initialize manual time tracking if needed
+      if (!state.manualTime) {
+        // Start from current time to avoid time jumps
+        state.manualTime = performance.now();
+      }
+
+      // Accumulate time
+      state.manualTime += timeDeltaMs;
+
+      // Update tweenGroup with absolute time
+      state.tweenGroup.update(state.manualTime);
+      return this;
+    },
     _animationCycle(state) {
       state.animationFrameRequestId = requestAnimationFrame(this._animationCycle);
       state.tweenGroup.update(); // run tween updates
