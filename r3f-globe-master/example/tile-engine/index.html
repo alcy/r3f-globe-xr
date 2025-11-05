@@ -1,0 +1,81 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script type="importmap">{ "imports": {
+    "three": "https://esm.sh/three",
+    "three/": "https://esm.sh/three/",
+    "three/addons/": "https://esm.sh/three/examples/jsm/",
+    "react": "https://esm.sh/react",
+    "react/": "https://esm.sh/react/",
+    "react-dom": "https://esm.sh/react-dom/client",
+    "react-dom/": "https://esm.sh/react-dom/",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber?external=react,react-dom,three",
+    "@react-three/drei": "https://esm.sh/@react-three/drei?external=@react-three/fiber,react,react-dom,three"
+  }}</script>
+
+<!--  <script type="module">import * as THREE from 'three'; import * as React from 'react'; window.THREE = THREE; window.React = React;</script>-->
+<!--  <script src="../../dist/r3f-globe.js" defer></script>-->
+</head>
+
+<body>
+  <div id="r3fScene"></div>
+
+  <script src="//unpkg.com/@babel/standalone"></script>
+  <script type="text/jsx" data-type="module">
+    import R3fGlobe from 'https://esm.sh/r3f-globe?external=three,react';
+    import React, { useMemo, useCallback, useRef, useEffect } from "react";
+    import ReactDOM from "react-dom";
+    import { Canvas, useThree } from '@react-three/fiber';
+    import { OrbitControls } from '@react-three/drei';
+
+    const ControlledGlobe = () => {
+      const globeRef = useRef();
+      const controlsRef = useRef();
+      const { camera } = useThree();
+
+      // Report initial camera position to globe
+      useEffect(() => { globeRef.current.setPointOfView(camera); }, []);
+
+      return <>
+        <OrbitControls
+          ref={controlsRef}
+          minDistance={100 + Math.max(0.001, camera.near * 1.1)}
+          maxDistance={camera.far - 100}
+          dampingFactor={0.1}
+          zoomSpeed={0.3}
+          rotateSpeed={0.3}
+          onChange={useCallback(() => {
+            // Report new camera position to globe in order to manage the tile levels
+            globeRef.current.setPointOfView(camera);
+
+            // adjust controls speed based on altitude
+            const R = globeRef.current.getGlobeRadius();
+            const distToSurface = camera.position.length() - R;
+            controlsRef.current.rotateSpeed = distToSurface / R * 0.4;
+            controlsRef.current.zoomSpeed = Math.sqrt(distToSurface / R) * 0.3;
+          }, [])}
+        />
+
+        <R3fGlobe
+          ref={globeRef}
+          globeTileEngineUrl={useCallback((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`, [])}
+        />
+      </>;
+    };
+
+    const Scene = () => {
+      return <div style={{ height: window.innerHeight }}>
+        <Canvas flat camera={useMemo(() => ({ fov: 50, position: [0, 0, 400], near: 0.01, far: 1e4 }), [])}>
+          <ControlledGlobe />
+
+          <color attach="background" args={[0, 0, 0]}/>
+          <ambientLight color={0xcccccc} intensity={Math.PI}/>
+          <directionalLight intensity={0.6 * Math.PI}/>
+        </Canvas>
+      </div>;
+    };
+
+    ReactDOM.createRoot(document.getElementById('r3fScene'))
+      .render(<Scene />);
+  </script>
+</body>

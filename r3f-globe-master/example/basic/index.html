@@ -1,0 +1,66 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script type="importmap">{ "imports": {
+    "three": "https://esm.sh/three",
+    "three/": "https://esm.sh/three/",
+    "three/addons/": "https://esm.sh/three/examples/jsm/",
+    "react": "https://esm.sh/react",
+    "react/": "https://esm.sh/react/",
+    "react-dom": "https://esm.sh/react-dom/client",
+    "react-dom/": "https://esm.sh/react-dom/",
+    "@react-three/fiber": "https://esm.sh/@react-three/fiber?external=react,react-dom,three",
+    "@react-three/drei": "https://esm.sh/@react-three/drei?external=@react-three/fiber,react,react-dom,three"
+  }}</script>
+
+<!--  <script type="module">import * as THREE from 'three'; import * as React from 'react'; window.THREE = THREE; window.React = React;</script>-->
+<!--  <script src="../../dist/r3f-globe.js" defer></script>-->
+</head>
+
+<body>
+  <div id="r3fScene"></div>
+
+  <script src="//unpkg.com/@babel/standalone"></script>
+  <script type="text/jsx" data-type="module">
+    import R3fGlobe from 'https://esm.sh/r3f-globe?external=three,react';
+    import React, { useMemo, useCallback } from "react";
+    import ReactDOM from "react-dom";
+    import { Canvas } from '@react-three/fiber';
+    import { OrbitControls } from '@react-three/drei';
+
+    const GlobeViz = () => {
+      const N = 300;
+      const gData = useMemo(() => [...Array(N).keys()].map(() => ({
+        lat: (Math.random() - 0.5) * 180,
+        lng: (Math.random() - 0.5) * 360,
+        size: Math.random() / 3,
+        color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
+      })), [N]);
+
+      return <R3fGlobe
+        globeImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
+        bumpImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
+        pointsData={gData}
+        pointAltitude="size"
+        pointColor="color"
+        onHover={useCallback((...args) => console.log('hover', ...args), [])}
+        onClick={useCallback((...args) => console.log('click', ...args), [])}
+      />;
+    }
+
+    const Scene = () => {
+      return <div style={{ height: window.innerHeight }}>
+        <Canvas flat camera={useMemo(() => ({ fov: 50, position: [0, 0, 350] }), [])}>
+          <OrbitControls minDistance={101} maxDistance={1e4} dampingFactor={0.1} zoomSpeed={0.3} rotateSpeed={0.3} />
+          <color attach="background" args={[0, 0, 0]}/>
+          <ambientLight color={0xcccccc} intensity={Math.PI}/>
+          <directionalLight intensity={0.6 * Math.PI}/>
+          <GlobeViz />
+        </Canvas>
+      </div>;
+    };
+
+    ReactDOM.createRoot(document.getElementById('r3fScene'))
+      .render(<Scene />);
+  </script>
+</body>
