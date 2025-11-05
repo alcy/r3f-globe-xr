@@ -64,6 +64,10 @@ function GlobeViz() {
     if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
       globe.__kapsuleInstance?.tickManually(timeDeltaMs)
+
+      // System 3: Update point of view for occlusion culling and layer updates
+      // Critical for VR to prevent visual artifacts when camera moves
+      globe.setPointOfView(state.camera)
     }
   })
 
