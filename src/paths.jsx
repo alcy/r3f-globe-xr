@@ -9,7 +9,7 @@ import { patchThreeGlobeForXR } from './utils/patch-three-globe-for-xr'
 const xrPatch = patchThreeGlobeForXR()
 
 const store = createXRStore({
-  // foveation: 0 // Optional: can improve quality but reduces performance
+  foveation: 0 // Disable FFR to eliminate rectangular artifact (may reduce performance)
 })
 
 function Controls() {
