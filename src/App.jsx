@@ -38,29 +38,11 @@ function GlobeViz() {
     color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
   })), [])
 
-  // XR Mode: Pause RAF when entering XR, resume when exiting
-  useEffect(() => {
-    if (globeRef.current && globeRef.current.children[0]) {
-      const globe = globeRef.current.children[0]
-      const arcsLayer = globe.__kapsuleInstance?._state?.arcsLayer
-
-      if (arcsLayer) {
-        if (isPresenting) {
-          // Entering XR: pause automatic RAF ticker
-          arcsLayer.pauseAnimation()
-          console.log('[XR Mode] Entered XR - arc animations paused, now driven by useFrame')
-        } else {
-          // Exiting XR: resume automatic RAF ticker
-          arcsLayer.resumeAnimation()
-          console.log('[Desktop Mode] Exited XR - arc animations resumed to RAF')
-        }
-      }
-    }
-  }, [isPresenting])
-
-  // Manually drive arc animations via useFrame (only when in XR!)
+  // Manually drive arc animations via useFrame
+  // In desktop: this supplements the automatic RAF ticker (mostly redundant)
+  // In XR: this is the ONLY thing updating (browser RAF doesn't render in XR)
   useFrame((state, delta) => {
-    if (isPresenting && globeRef.current && globeRef.current.children[0]) {
+    if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
       const arcsLayer = globe.__kapsuleInstance?._state?.arcsLayer
 
