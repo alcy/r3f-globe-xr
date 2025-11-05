@@ -26,6 +26,7 @@ function GlobeViz() {
   const isDragging = useRef(false)
   const previousPointer = useRef(null)
   const lastFrameTime = useRef(performance.now())
+  const { isPresenting } = useXR()
 
   // Generate random arcs data
   const N = 20
@@ -37,23 +38,29 @@ function GlobeViz() {
     color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
   })), [])
 
-  // XR Mode: Pause automatic RAF animations on mount
+  // XR Mode: Pause RAF when entering XR, resume when exiting
   useEffect(() => {
     if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
       const kapsule = globe.__kapsuleInstance
 
       if (kapsule?.arcsLayer) {
-        // Pause the automatic requestAnimationFrame ticker
-        kapsule.arcsLayer.pauseAnimation()
-        console.log('[XR Mode] Arc animations paused - now driven by useFrame')
+        if (isPresenting) {
+          // Entering XR: pause automatic RAF ticker
+          kapsule.arcsLayer.pauseAnimation()
+          console.log('[XR Mode] Entered XR - arc animations paused, now driven by useFrame')
+        } else {
+          // Exiting XR: resume automatic RAF ticker
+          kapsule.arcsLayer.resumeAnimation()
+          console.log('[Desktop Mode] Exited XR - arc animations resumed to RAF')
+        }
       }
     }
-  }, [])
+  }, [isPresenting])
 
-  // XR Mode: Manually drive arc animations via useFrame (works in VR!)
+  // Manually drive arc animations via useFrame (only when in XR!)
   useFrame((state, delta) => {
-    if (globeRef.current && globeRef.current.children[0]) {
+    if (isPresenting && globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
       const kapsule = globe.__kapsuleInstance
 
