@@ -74,6 +74,25 @@ export default Kapsule({
     resumeAnimation: function(state) {
       state.ticker?.resume();
     },
+    tickManually: function(state, timeDeltaMs) {
+      // XR-compatible manual tick: fires onTick callbacks without RAF
+      // timeDeltaMs: time delta in milliseconds since last frame
+      if (!state.ticker) return;
+
+      const timeDeltaSec = timeDeltaMs / 1000;
+
+      // Manually dispatch the onTick event
+      // This fires all registered callbacks (including the arc animation at line 109)
+      state.ticker.onTick.dispatch([
+        state.manualTimeSeconds || 0,
+        timeDeltaSec,
+        state.manualFrameCount || 0
+      ]);
+
+      // Update manual timing state
+      state.manualTimeSeconds = (state.manualTimeSeconds || 0) + timeDeltaSec;
+      state.manualFrameCount = (state.manualFrameCount || 0) + 1;
+    },
     _destructor: function(state) {
       state.sharedMaterial.dispose();
       state.ticker?.dispose();

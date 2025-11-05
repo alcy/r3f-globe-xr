@@ -37,66 +37,31 @@ function GlobeViz() {
     color: ['red', 'white', 'blue', 'green'][Math.round(Math.random() * 3)]
   })), [])
 
-  // Debug: Look into Child 2 which has 20 children (= our 20 arcs!)
+  // XR Mode: Pause automatic RAF animations on mount
   useEffect(() => {
     if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
-      const arcsLayerGroup = globe.children[2] // Child 2 had 20 children
-
-      console.log('Arcs Layer Group (Child 2):', arcsLayerGroup)
-      console.log('Arcs Layer Group children:', arcsLayerGroup?.children?.length)
-
-      if (arcsLayerGroup && arcsLayerGroup.children.length > 0) {
-        const firstArc = arcsLayerGroup.children[0]
-        console.log('First arc:', firstArc)
-        console.log('First arc type:', firstArc.type)
-        console.log('First arc __globeObjType:', firstArc.__globeObjType)
-        console.log('First arc children:', firstArc.children)
-
-        if (firstArc.children.length > 0) {
-          const arcMesh = firstArc.children[0]
-          console.log('Arc mesh:', arcMesh)
-          console.log('Arc mesh material:', arcMesh.material)
-          console.log('Arc mesh __dashAnimateStep:', arcMesh.__dashAnimateStep)
-        }
-      }
-
-      // Try to find ticker by searching the kapsule
       const kapsule = globe.__kapsuleInstance
-      console.log('Trying to access kapsule internal state...')
-      console.log('kapsule._state:', kapsule._state)
-      // Access hidden properties
-      for (let key in kapsule) {
-        if (key.includes('arcs') || key.includes('ticker') || key.includes('state')) {
-          console.log(`Found key: ${key}`, kapsule[key])
-        }
+
+      if (kapsule?.arcsLayer) {
+        // Pause the automatic requestAnimationFrame ticker
+        kapsule.arcsLayer.pauseAnimation()
+        console.log('[XR Mode] Arc animations paused - now driven by useFrame')
       }
     }
-  }, [arcsData])
+  }, [])
 
-  // Manually update arc animations in useFrame (works in VR!)
+  // XR Mode: Manually drive arc animations via useFrame (works in VR!)
   useFrame((state, delta) => {
     if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
-      const arcsLayerGroup = globe.children[2] // The group with arcs
+      const kapsule = globe.__kapsuleInstance
 
-      if (arcsLayerGroup && arcsLayerGroup.children) {
-        // Update each arc's dash animation
-        // delta is in seconds, convert to milliseconds for the step calculation
+      if (kapsule?.arcsLayer) {
+        // Manually tick the animation system
+        // delta is in seconds, convert to milliseconds
         const timeDeltaMs = delta * 1000
-
-        arcsLayerGroup.children.forEach(arcGroup => {
-          if (arcGroup.children && arcGroup.children.length > 0) {
-            const arcMesh = arcGroup.children[0]
-
-            if (arcMesh.material && arcMesh.material.uniforms && arcMesh.__dashAnimateStep) {
-              // __dashAnimateStep is "per second", so multiply by delta (in seconds)
-              const step = arcMesh.__dashAnimateStep * delta
-              const curTranslate = arcMesh.material.uniforms.dashTranslate?.value || 0
-              arcMesh.material.uniforms.dashTranslate.value = (curTranslate + step) % 1e9
-            }
-          }
-        })
+        kapsule.arcsLayer.tickManually(timeDeltaMs)
       }
     }
   })
