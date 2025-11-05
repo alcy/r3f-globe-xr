@@ -66,8 +66,14 @@ function GlobeViz() {
       globe.__kapsuleInstance?.tickManually(timeDeltaMs)
 
       // System 3: Update point of view for occlusion culling and layer updates
-      // Critical for VR to prevent visual artifacts when camera moves
-      globe.setPointOfView(state.camera)
+      // In XR, we pass camera position only (not full camera) to avoid tile engine frustum issues
+      if (isPresenting) {
+        // In VR/AR mode, pass position only to prevent tile engine viewport artifacts
+        globe.setPointOfView(state.camera.position)
+      } else {
+        // In desktop mode, pass full camera for proper frustum calculation
+        globe.setPointOfView(state.camera)
+      }
     }
   })
 
