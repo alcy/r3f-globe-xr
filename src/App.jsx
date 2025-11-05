@@ -42,16 +42,16 @@ function GlobeViz() {
   useEffect(() => {
     if (globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
-      const kapsule = globe.__kapsuleInstance
+      const arcsLayer = globe.__kapsuleInstance?._state?.arcsLayer
 
-      if (kapsule?.arcsLayer) {
+      if (arcsLayer) {
         if (isPresenting) {
           // Entering XR: pause automatic RAF ticker
-          kapsule.arcsLayer.pauseAnimation()
+          arcsLayer.pauseAnimation()
           console.log('[XR Mode] Entered XR - arc animations paused, now driven by useFrame')
         } else {
           // Exiting XR: resume automatic RAF ticker
-          kapsule.arcsLayer.resumeAnimation()
+          arcsLayer.resumeAnimation()
           console.log('[Desktop Mode] Exited XR - arc animations resumed to RAF')
         }
       }
@@ -62,13 +62,13 @@ function GlobeViz() {
   useFrame((state, delta) => {
     if (isPresenting && globeRef.current && globeRef.current.children[0]) {
       const globe = globeRef.current.children[0]
-      const kapsule = globe.__kapsuleInstance
+      const arcsLayer = globe.__kapsuleInstance?._state?.arcsLayer
 
-      if (kapsule?.arcsLayer) {
+      if (arcsLayer) {
         // Manually tick the animation system
         // delta is in seconds, convert to milliseconds
         const timeDeltaMs = delta * 1000
-        kapsule.arcsLayer.tickManually(timeDeltaMs)
+        arcsLayer.tickManually(timeDeltaMs)
       }
     }
   })
