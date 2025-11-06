@@ -2,20 +2,19 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { XR, createXRStore, useXR } from '@react-three/xr'
 import R3fGlobe from 'r3f-globe'
-import { useState, useRef, useEffect } from 'react'
+import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
 import { patchThreeGlobeForXR } from './utils/patch-three-globe-for-xr'
 import * as satellite from 'satellite.js'
-import { TextureLoader, SRGBColorSpace } from 'three'
 
-// Initialize XR patch - this will make frame-ticker replacement available
+// IMPORTANT: Apply XR patch BEFORE creating any Globe instances!
 const xrPatch = patchThreeGlobeForXR()
 
 const store = createXRStore({
   foveation: 0 // Disable FFR to eliminate rectangular artifact (may reduce performance)
 })
 
-const EARTH_RADIUS_KM = 6371 // km
-const TIME_STEP = 1.5 * 1000 // per frame
+const EARTH_RADIUS_KM = 6371
+const TIME_STEP = 3 * 1000 // 3 seconds per frame
 
 function Controls() {
   const { isPresenting } = useXR()
@@ -34,49 +33,45 @@ function GlobeViz() {
   const globeRef = useRef()
   const isDragging = useRef(false)
   const previousPointer = useRef(null)
-  const { isPresenting } = useXR()
-  const [satData, setSatData] = useState([])
-  const [particlesData, setParticlesData] = useState([])
-  const [satTexture, setSatTexture] = useState(null)
-  const timeRef = useRef(new Date())
+  const manualModeEnabled = useRef(false)
 
-  // Load satellite data and texture
+  const [satData, setSatData] = useState()
+  const [time, setTime] = useState(new Date())
+
+  // Load satellite data
   useEffect(() => {
-    // Load satellite icon texture
-    const loader = new TextureLoader()
-    loader.load('/sat-icon.png', texture => {
-      texture.colorSpace = SRGBColorSpace
-      setSatTexture(texture)
-    })
-
-    // Load TLE data
-    fetch('/space-track-leo.txt')
+    fetch('//cdn.jsdelivr.net/npm/globe.gl/example/datasets/space-track-leo.txt')
       .then(r => r.text())
       .then(rawData => {
-        const tleData = rawData.replace(/\r/g, '').split(/\n(?=[^12])/).map(tle => tle.split('\n'))
-        const satellites = tleData.map(([name, ...tle]) => ({
-          satrec: satellite.twoline2satrec(...tle),
-          name: name.trim().replace(/^0 /, '')
-        }))
-        // exclude those that can't be propagated
-        .filter(d => !!satellite.propagate(d.satrec, new Date())?.position)
+        const tleData = rawData.replace(/\r/g, '')
+          .split(/\n(?=[^12])/)
+          .filter(d => d)
+          .map(tle => tle.split('\n'))
 
-        setSatData(satellites)
+        const satData = tleData
+          .map(([name, ...tle]) => ({
+            satrec: satellite.twoline2satrec(...tle),
+            name: name.trim().replace(/^0 /, '')
+          }))
+          .filter(d => !!satellite.propagate(d.satrec, new Date())?.position)
+
+        setSatData(satData)
       })
   }, [])
 
-  // Enable manual mode on mount (for XR compatibility)
-  useEffect(() => {
-    // Enable manual mode for all FrameTicker instances
-    // This stops automatic RAF and lets us drive animations via useFrame
-    xrPatch.enableManualMode()
-    console.log('[XR] Manual animation mode enabled')
-  }, [])
-
-  // Drive BOTH animation systems manually via useFrame
-  // This works in both desktop and XR modes
+  // Drive XR animations AND update satellite time
   useFrame((state, delta) => {
     const timeDeltaMs = delta * 1000
+
+    // Enable manual mode once tickers exist
+    if (!manualModeEnabled.current) {
+      const tickers = xrPatch.getTickers()
+      if (tickers.length > 0) {
+        console.log('[Globe] Tickers detected, enabling manual animation mode for XR')
+        xrPatch.enableManualMode()
+        manualModeEnabled.current = true
+      }
+    }
 
     // System 1: Layer tickers (arcs, paths, rings, particles)
     // Handled by our FrameTicker replacement
@@ -89,33 +84,32 @@ function GlobeViz() {
       globe.__kapsuleInstance?.tickManually(timeDeltaMs)
     }
 
-    // System 3: Update satellite positions
-    if (satData.length > 0) {
-      // Advance time
-      timeRef.current = new Date(+timeRef.current + TIME_STEP)
-      const time = timeRef.current
-
-      // Calculate new positions
-      const gmst = satellite.gstime(time)
-      const updatedSats = satData.map(d => {
-        const eci = satellite.propagate(d.satrec, time)
-        if (eci?.position) {
-          const gdPos = satellite.eciToGeodetic(eci.position, gmst)
-          return {
-            ...d,
-            lat: satellite.radiansToDegrees(gdPos.latitude),
-            lng: satellite.radiansToDegrees(gdPos.longitude),
-            alt: gdPos.height / EARTH_RADIUS_KM
-          }
-        }
-        return { ...d, lat: NaN, lng: NaN, alt: NaN }
-      })
-
-      // Filter out invalid positions and update
-      const validSats = updatedSats.filter(d => !isNaN(d.lat) && !isNaN(d.lng) && !isNaN(d.alt))
-      setParticlesData(validSats)
-    }
+    // System 3: Update satellite time every frame
+    setTime(time => new Date(+time + TIME_STEP))
   })
+
+  // Calculate satellite positions
+  const particlesData = useMemo(() => {
+    if (!satData) return []
+
+    const gmst = satellite.gstime(time)
+    // Return array of arrays - each particle set is a group
+    return [
+      satData
+        .map(d => {
+          const eci = satellite.propagate(d.satrec, time)
+          if (eci?.position) {
+            const gdPos = satellite.eciToGeodetic(eci.position, gmst)
+            const lat = satellite.radiansToDegrees(gdPos.latitude)
+            const lng = satellite.radiansToDegrees(gdPos.longitude)
+            const alt = gdPos.height / EARTH_RADIUS_KM
+            return { ...d, lat, lng, alt }
+          }
+          return null
+        })
+        .filter(d => d && !isNaN(d.lat) && !isNaN(d.lng) && !isNaN(d.alt))
+    ]
+  }, [satData, time])
 
   const handlePointerDown = (e) => {
     e.stopPropagation()
@@ -151,12 +145,16 @@ function GlobeViz() {
     >
       <R3fGlobe
         globeImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-blue-marble.jpg"
+        bumpImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
         particlesData={particlesData}
+        particleLabel="name"
         particleLat="lat"
         particleLng="lng"
         particleAltitude="alt"
-        particlesSize={2}
-        particlesTexture={satTexture}
+        particlesColor={useCallback(() => '#00ff00', [])}
+        particlesSize={0.02}
+        particlesSizeAttenuation={false}
+        particlesTransitionDuration={0}
       />
     </group>
   )
