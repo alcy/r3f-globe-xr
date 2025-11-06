@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei'
 import { XR, createXRStore, useXR } from '@react-three/xr'
 import R3fGlobe from 'r3f-globe'
 import { useMemo, useCallback, useState, useRef, useEffect } from 'react'
-import { patchThreeGlobeForXR } from './utils/patch-three-globe-for-xr'
+import { patchThreeGlobeForXR } from '../utils/patch-three-globe-for-xr'
 import * as satellite from 'satellite.js'
 
 // IMPORTANT: Apply XR patch BEFORE creating any Globe instances!
