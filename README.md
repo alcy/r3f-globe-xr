@@ -50,6 +50,8 @@ The app will start at `https://x.x.x.x:5173` (HTTPS required for WebXR). You can
 
 ## Usage
 
+**Note** In some examples (mainly CountryPolygons), the controls are a bit messy, be careful about motion sickness / disorientation
+
 ### Testing Examples
 Switch between examples by modifying `src/main.jsx`:
 
@@ -74,7 +76,7 @@ createRoot(document.getElementById('root')).render(
 - **Arcs**: Animated arcs between random points
 - **Airlines**: US international flight routes
 - **Clouds**: Rotating cloud layer over the globe
-- **CountryPolygons**: Country borders with hover effects
+- **CountryPolygons**: Country borders with hover effects 
 - **Paths**: Animated paths across the globe
 - **Ripples**: Ripple effects on globe surface
 - **Satellites**: Real-time LEO satellite tracking
