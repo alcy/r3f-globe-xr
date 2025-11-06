@@ -17,5 +17,15 @@ export default defineConfig({
       'three-globe': path.resolve(__dirname, './three-globe-master/dist/three-globe.mjs')
     },
     dedupe: ['three']  // Ensure only one Three.js instance is used across all dependencies
+  },
+  optimizeDeps: {
+    // Force Vite to optimize these dependencies and dedupe Three.js within them
+    include: [
+      'three',
+      '@react-three/fiber',
+      '@react-three/drei',
+      '@react-three/xr',
+      'r3f-globe'
+    ]
   }
 })
