@@ -4,7 +4,7 @@
 
 ## What This Does
 
-This project enables [three-globe](https://github.com/vasturiano/three-globe) to work  in WebXR (VR/AR) environments by monkey patching two animation systems that normally rely on `requestAnimationFrame`:
+This project enables [three-globe](https://github.com/vasturiano/three-globe) to work  in WebXR (VR/AR) environments by monkey patching two animation systems that normally rely on `requestAnimationFrame` (see [here](https://github.com/pmndrs/xr/issues/180) for a brief explanation about the core problem):
 
 ### 1. FrameTicker System (Layer Animations)
 **Problem**: three-globe layers (arcs, paths, rings, particles) use `frame-ticker` which calls its own RAF loop, incompatible with XR.
