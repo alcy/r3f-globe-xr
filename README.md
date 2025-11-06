@@ -1,10 +1,10 @@
 # r3f-globe-xr
 
-XR/VR/AR support for r3f-globe with React Three Fiber XR.
+**EXPERIMENTAL** XR/VR support for [r3f-globe](https://github.com/vasturiano/r3f-globe) with [React Three Fiber XR](https://github.com/pmndrs/xr). Tested with **Meta Quest 3S**.
 
 ## What This Does
 
-This project enables **three-globe** to work seamlessly in WebXR (VR/AR) environments by patching two animation systems that normally rely on `requestAnimationFrame`:
+This project enables [three-globe](https://github.com/vasturiano/three-globe) to work  in WebXR (VR/AR) environments by patching two animation systems that normally rely on `requestAnimationFrame`:
 
 ### 1. FrameTicker System (Layer Animations)
 **Problem**: three-globe layers (arcs, paths, rings, particles) use `frame-ticker` which calls its own RAF loop, incompatible with XR.
@@ -46,7 +46,7 @@ npm install
 npm run dev
 ```
 
-The app will start at `https://localhost:5173` (HTTPS required for WebXR).
+The app will start at `https://x.x.x.x:5173` (HTTPS required for WebXR). You can then access this URL on your headset's browser. 
 
 ## Usage
 
@@ -77,17 +77,13 @@ createRoot(document.getElementById('root')).render(
 - **Paths**: Animated paths across the globe
 - **Ripples**: Ripple effects on globe surface
 
-### Desktop Controls
-**Note**: The globe is scaled for VR viewing, making it very small/almost invisible in desktop mode. For the best experience, click **Enter VR** or **Enter AR** buttons at the bottom of the screen to enter immersive mode.
-
-If viewing in desktop:
-- Mouse drag to rotate
-- Scroll to zoom
-- OrbitControls active when not in XR
-
 ### VR/AR Controls
 - VR controllers or hand tracking to grab and rotate globe
 - Enter VR/AR via buttons at bottom of screen
+  
+### Desktop Controls
+**Note**: The globe is scaled for VR viewing, making it very small/almost invisible in desktop mode. For the best experience, click **Enter VR** or **Enter AR** buttons at the bottom of the screen to enter immersive mode.
+
 
 ## Technical Details
 
@@ -110,8 +106,3 @@ resolve: {
 - `three-globe-master/src/globe-kapsule.js` - Patched with `tickManually()`
 - `src/examples/` - All working examples
 
-## Requirements
-
-- Modern browser with WebXR support (Chrome, Edge, Firefox Reality, etc.)
-- VR headset (Meta Quest, etc.) or AR-capable device for XR features
-- HTTPS connection (required by WebXR API)
