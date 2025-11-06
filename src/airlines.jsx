@@ -11,7 +11,7 @@ import indexBy from 'index-array-by'
 const xrPatch = patchThreeGlobeForXR()
 
 const store = createXRStore({
-  foveation: 0 // Disable FFR to eliminate rectangular artifact (may reduce performance)
+  foveation: 1 // Enable for airlines example
 })
 
 const COUNTRY = 'United States'

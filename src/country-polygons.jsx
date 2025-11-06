@@ -103,7 +103,7 @@ function GlobeViz() {
     <group
       ref={globeRef}
       position={[0, 1.5, -2.5]}
-      scale={0.01}
+      scale={0.007}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerMove={handlePointerMove}
