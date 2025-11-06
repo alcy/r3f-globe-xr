@@ -15,6 +15,7 @@ export default defineConfig({
 
       // Use our locally patched three-globe with XR support (adds tickManually for tweenGroup)
       'three-globe': path.resolve(__dirname, './three-globe-master/dist/three-globe.mjs')
-    }
+    },
+    dedupe: ['three']  // Ensure only one Three.js instance is used across all dependencies
   }
 })
