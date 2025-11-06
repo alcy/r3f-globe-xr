@@ -1,6 +1,6 @@
 # r3f-globe-xr
 
-XR/VR/AR support for r3f-globe with React Three Fiber.
+XR/VR/AR support for r3f-globe with React Three Fiber XR.
 
 ## What This Does
 
@@ -78,6 +78,9 @@ createRoot(document.getElementById('root')).render(
 - **Ripples**: Ripple effects on globe surface
 
 ### Desktop Controls
+**Note**: The globe is scaled for VR viewing, making it very small/almost invisible in desktop mode. For the best experience, click **Enter VR** or **Enter AR** buttons at the bottom of the screen to enter immersive mode.
+
+If viewing in desktop:
 - Mouse drag to rotate
 - Scroll to zoom
 - OrbitControls active when not in XR
@@ -112,7 +115,3 @@ resolve: {
 - Modern browser with WebXR support (Chrome, Edge, Firefox Reality, etc.)
 - VR headset (Meta Quest, etc.) or AR-capable device for XR features
 - HTTPS connection (required by WebXR API)
-
-## License
-
-This project demonstrates XR compatibility patches for three-globe and r3f-globe.
