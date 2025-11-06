@@ -47,9 +47,6 @@ import {
  * @returns {Object} API for controlling XR animations
  */
 export function patchThreeGlobeForXR() {
-  console.log('[XR Patch] three-globe will use XR-compatible FrameTicker')
-  console.log('[XR Patch] All animation layers (arcs, paths, rings, particles) will work in VR/AR')
-
   return getXRPatchAPI()
 }
 
@@ -64,7 +61,6 @@ function getXRPatchAPI() {
      * Call this when entering XR or at app start if always in XR
      */
     enableManualMode: () => {
-      console.log('[XR Patch] Enabling manual animation mode')
       enableManualModeForAll()
     },
 
@@ -73,7 +69,6 @@ function getXRPatchAPI() {
      * Call this when exiting XR (if you want desktop to use automatic)
      */
     disableManualMode: () => {
-      console.log('[XR Patch] Disabling manual animation mode')
       disableManualModeForAll()
     },
 
