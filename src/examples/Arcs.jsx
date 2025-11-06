@@ -118,7 +118,7 @@ function GlobeViz() {
   )
 }
 
-function App() {
+function ArcsApp() {
   return (
     <>
       <div style={{
@@ -178,4 +178,4 @@ function App() {
   )
 }
 
-export default App
+export default ArcsApp

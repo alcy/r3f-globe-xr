@@ -1,14 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import AirlinesApp from './airlines.jsx'
-import CountryPolygonsApp from './country-polygons.jsx'
-import PathsApp from './paths.jsx'
-import RipplesApp from './ripples.jsx'
-import SatellitesApp from './satellites.jsx'
+import ArcsApp from './examples/Arcs.jsx'
+import AirlinesApp from './examples/Airlines.jsx'
+import CountryPolygonsApp from './examples/CountryPolygons.jsx'
+import PathsApp from './examples/Paths.jsx'
+import RipplesApp from './examples/Ripples.jsx'
+import SatellitesApp from './examples/Satellites.jsx'
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ArcsApp />
   </StrictMode>,
 )
