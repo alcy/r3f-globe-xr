@@ -79,7 +79,6 @@ function GlobeViz() {
     if (!manualModeEnabled.current) {
       const tickers = xrPatch.getTickers()
       if (tickers.length > 0) {
-        console.log('[Globe] Tickers detected, enabling manual animation mode for XR')
         xrPatch.enableManualMode()
         manualModeEnabled.current = true
       }
