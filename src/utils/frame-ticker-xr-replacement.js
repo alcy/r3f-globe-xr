@@ -18,8 +18,6 @@ export class FrameTickerXR {
     this._currentTick = 0
     this._rafId = null
 
-    console.log('[FrameTickerXR] Created new ticker instance')
-
     // Register globally so we can control all tickers
     if (!window.__xrTickers) {
       window.__xrTickers = new Set()
@@ -75,17 +73,6 @@ export class FrameTickerXR {
    * Enable manual mode - stops automatic RAF, allows manual ticks
    */
   enableManualMode() {
-    console.log('[FrameTickerXR] Enabling manual mode')
-    console.log('[FrameTickerXR] Time before:', this._currentTime)
-
-    // If time is very low (< 2 seconds), boost it
-    // This ensures rings have enough time to initialize
-    if (this._currentTime < 2000) {
-      console.log('[FrameTickerXR] Time too low, boosting to 2000ms')
-      this._currentTime = 2000
-    }
-
-    console.log('[FrameTickerXR] Time after:', this._currentTime)
     this._manualMode = true
     this._stopRAF()
   }
@@ -94,7 +81,6 @@ export class FrameTickerXR {
    * Disable manual mode - resumes automatic RAF
    */
   disableManualMode() {
-    console.log('[FrameTickerXR] Disabling manual mode')
     this._manualMode = false
     if (this._isRunning) {
       this._startRAF()
@@ -193,13 +179,11 @@ export function getAllXRTickers() {
 
 export function enableManualModeForAll() {
   const tickers = getAllXRTickers()
-  console.log('[FrameTickerXR] Enabling manual mode for', tickers.length, 'tickers')
   tickers.forEach(ticker => ticker.enableManualMode())
 }
 
 export function disableManualModeForAll() {
   const tickers = getAllXRTickers()
-  console.log('[FrameTickerXR] Disabling manual mode for', tickers.length, 'tickers')
   tickers.forEach(ticker => ticker.disableManualMode())
 }
 
