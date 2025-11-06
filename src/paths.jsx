@@ -59,7 +59,6 @@ function GlobeViz() {
     // Enable manual mode for all FrameTicker instances
     // This stops automatic RAF and lets us drive animations via useFrame
     xrPatch.enableManualMode()
-    console.log('[XR] Manual animation mode enabled')
 
     // After 6 seconds, animate paths to use altitude values
     setTimeout(() => {

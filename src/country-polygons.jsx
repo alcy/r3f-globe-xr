@@ -57,7 +57,6 @@ function GlobeViz() {
     // Enable manual mode for all FrameTicker instances
     // This stops automatic RAF and lets us drive animations via useFrame
     xrPatch.enableManualMode()
-    console.log('[XR] Manual animation mode enabled')
   }, [])
 
   // Drive BOTH animation systems manually via useFrame
