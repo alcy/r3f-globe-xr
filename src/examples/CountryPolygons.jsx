@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei'
 import { XR, createXRStore, useXR } from '@react-three/xr'
 import R3fGlobe from 'r3f-globe'
 import { useState, useRef, useEffect } from 'react'
-import { patchThreeGlobeForXR } from './utils/patch-three-globe-for-xr'
+import { patchThreeGlobeForXR } from '../utils/patch-three-globe-for-xr'
 
 // Initialize XR patch - this will make frame-ticker replacement available
 const xrPatch = patchThreeGlobeForXR()

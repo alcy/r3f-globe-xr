@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei'
 import { XR, createXRStore, useXR } from '@react-three/xr'
 import R3fGlobe from 'r3f-globe'
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { patchThreeGlobeForXR } from './utils/patch-three-globe-for-xr'
+import { patchThreeGlobeForXR } from '../utils/patch-three-globe-for-xr'
 import { csvParseRows } from 'd3-dsv'
 import indexBy from 'index-array-by'
 
