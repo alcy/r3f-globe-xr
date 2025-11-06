@@ -56,6 +56,7 @@ Switch between examples by modifying `src/main.jsx`:
 ```javascript
 import ArcsApp from './examples/Arcs.jsx'
 import AirlinesApp from './examples/Airlines.jsx'
+import CloudsApp from './examples/Clouds.jsx'
 import CountryPolygonsApp from './examples/CountryPolygons.jsx'
 import PathsApp from './examples/Paths.jsx'
 import RipplesApp from './examples/Ripples.jsx'
@@ -72,10 +73,11 @@ createRoot(document.getElementById('root')).render(
 ### Available Examples
 - **Arcs**: Animated arcs between random points
 - **Airlines**: US international flight routes
-- **Satellites**: Real-time LEO satellite tracking
+- **Clouds**: Rotating cloud layer over the globe
 - **CountryPolygons**: Country borders with hover effects
 - **Paths**: Animated paths across the globe
 - **Ripples**: Ripple effects on globe surface
+- **Satellites**: Real-time LEO satellite tracking
 
 ### VR/AR Controls
 - VR controllers or hand tracking to grab and rotate globe
