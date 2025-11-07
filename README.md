@@ -1,6 +1,6 @@
 # r3f-globe-xr
 
-**EXPERIMENTAL** XR/VR support for [r3f-globe](https://github.com/vasturiano/r3f-globe) with [React Three Fiber XR](https://github.com/pmndrs/xr). Tested with **Meta Quest 3S**.
+**EXPERIMENTAL** XR/VR support for [r3f-globe](https://github.com/vasturiano/r3f-globe) with [React Three Fiber XR](https://github.com/pmndrs/xr). Tested on **Meta Quest 3S**.
 
 ## What This Does
 
